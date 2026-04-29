@@ -1,0 +1,42 @@
+<template>
+    <lightning-card title="Add New Employee (LWC Validation)">
+        <div class="slds-m-around_medium">
+            
+            <!-- Employee Name -->
+            <lightning-input label="Employee Name" value={empName} onchange={handleChange} data-field="empName" required></lightning-input>
+            
+            <!-- Employee ID -->
+            <lightning-input type="number" label="Employee ID" value={empId} onchange={handleChange} data-field="empId" required></lightning-input>
+            
+            <!-- Salary -->
+            <lightning-input type="number" label="Salary" value={salary} onchange={handleChange} data-field="salary" required></lightning-input>
+            
+            <!-- Email -->
+            <lightning-input type="email" label="Email Address" value={email} onchange={handleChange} data-field="email" required></lightning-input>
+            
+            <!-- Department -->
+            <lightning-combobox label="Department" value={department} placeholder="Select Department" options={deptOptions} onchange={handleChange} data-field="department" required></lightning-combobox>
+            
+            <!-- Joining Date -->
+            <lightning-input type="date" label="Joining Date" value={joiningDate} onchange={handleChange} data-field="joiningDate" required></lightning-input>
+            
+            <!-- Error Message Display -->
+            <template if:true={errorMessage}>
+                <div class="slds-text-color_error slds-m-top_medium">
+                    <b>Error:</b> {errorMessage}
+                </div>
+            </template>
+
+            <!-- Success Message Display -->
+            <template if:true={successMessage}>
+                <div class="slds-text-color_success slds-m-top_medium">
+                    <b>Success:</b> {successMessage}
+                </div>
+            </template>
+
+            <br/>
+            <lightning-button label="Save Employee" variant="brand" onclick={handleSave}></lightning-button>
+            
+        </div>
+    </lightning-card>
+</template>
