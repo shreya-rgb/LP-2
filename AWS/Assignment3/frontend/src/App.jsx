@@ -5,7 +5,7 @@ function App() {
   const [name, setName] = useState("");
 
   const addUser = async () => {
-    await axios.post("http://13.233.94.3:3000/add", { name });
+    await axios.post(`http://${window.location.hostname}:3000/add`, { name });
     alert("User added!");
   };
 
