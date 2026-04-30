@@ -7,7 +7,7 @@ app.use(cors());
 app.use(express.json());
 
 // 👉 YAHAN APNA ATLAS CONNECTION STRING DALNA
-mongoose.connect("mongodb+srv://shreya:Shreya@123@clusterccmern.yfhjrqk.mongodb.net/?retryWrites=true&w=majority&appName=ClusterCCMern");
+mongoose.connect("YOUR_MONGODB_CONNECTION_STRING");
 
 const Product = mongoose.model("Product", { name: String, price: Number });
 
