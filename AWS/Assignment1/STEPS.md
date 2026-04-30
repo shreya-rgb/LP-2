@@ -42,7 +42,7 @@ Once connected to the terminal of your Ubuntu instance, run the following comman
    ```
 
 ## Step 5: Deploy the HTML Website
-Now, you need to replace the default Apache landing page with your own `index.html`.
+Now, you need to replace the default Apache landing page with your own `index.html` using Git.
 
 1. Navigate to the Apache web directory:
    ```bash
@@ -52,14 +52,15 @@ Now, you need to replace the default Apache landing page with your own `index.ht
    ```bash
    sudo rm index.html
    ```
-3. Create your new `index.html` file:
+3. Clone your GitHub repository directly to your EC2 instance (we will download it to your home folder):
    ```bash
-   sudo nano index.html
+   cd ~
+   git clone https://github.com/shreya-rgb/cloud-assignments.git
    ```
-4. **Copy and paste** the HTML code provided in the `index.html` file of this repository.
-5. Save and exit the nano editor:
-   - Press `Ctrl + O`, then `Enter` to save.
-   - Press `Ctrl + X` to exit.
+4. Copy the `index.html` from the downloaded repository to the Apache web directory:
+   ```bash
+   sudo cp ~/cloud-assignments/AWS/Assignment1/index.html /var/www/html/
+   ```
 
 ## Step 6: Test the Hosted Website
 1. Go back to the AWS Management Console.
