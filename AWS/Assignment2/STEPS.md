@@ -1,5 +1,8 @@
 # Step-by-Step Guide: AWS Assignment 2 - Virtual Network Communication
 
+One thing to be aware of:
+Both instances must be in the same Security Group or the Security Group of node2 must allow SSH (port 22) inbound from node1's private IP — otherwise the SCP command will fail. Your steps don't explicitly mention this, but in most default AWS setups it works automatically since both instances share the default Security Group.
+
 ## Objective
 Create a virtual network and enable communication between two EC2 instances using their Private IP addresses.
 
