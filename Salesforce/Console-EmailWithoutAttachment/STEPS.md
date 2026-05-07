@@ -23,6 +23,14 @@ public class SendEmailExample {
         mail.setSubject('Test Email from Salesforce Apex');
         mail.setPlainTextBody('Hello, this is a test email sent using Apex.');
 
+        // ✅ ADD THESE 4 LINES FOR ATTACHMENT
+        Messaging.EmailFileAttachment attachment = new Messaging.EmailFileAttachment();
+        attachment.setFileName('MyReport.txt');
+        attachment.setBody(Blob.valueOf('This is the content of your attachment file.'));
+        attachment.setContentType('text/plain');
+        mail.setFileAttachments(new Messaging.EmailFileAttachment[] { attachment });
+        // ✅ END OF ATTACHMENT CODE
+
         Messaging.SendEmailResult[] results =
             Messaging.sendEmail(new Messaging.SingleEmailMessage[] {mail});
 
