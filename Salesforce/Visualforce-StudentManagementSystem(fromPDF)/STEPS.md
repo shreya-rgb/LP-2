@@ -68,6 +68,21 @@ public class StudentVariantController {
         delete [SELECT Id FROM Student_Variant__c WHERE Id = :student.Id];
         studentList = [SELECT Id, Student_Name__c, Roll_Number__c, Class__c, Mobile_No__c FROM Student_Variant__c];
     }
+
+   // Load student data into form for editing
+public void editStudent() {
+    student = [SELECT Id, Student_Name__c, Roll_Number__c, Class__c, Mobile_No__c 
+               FROM Student_Variant__c WHERE Id = :student.Id];
+}
+
+// Save the updated student
+public void updateStudent() {
+    update student;
+    student = new Student_Variant__c();
+    studentList = [SELECT Id, Student_Name__c, Roll_Number__c, Class__c, Mobile_No__c 
+                   FROM Student_Variant__c];
+}
+
 }
 ```
 
@@ -94,6 +109,7 @@ Paste & Save:
                 <apex:inputText value="{!student.Mobile_No__c}" label="Mobile No"/>
 
                 <apex:commandButton value="Add Student" action="{!addStudent}" rerender="studentTable"/>
+<apex:commandButton value="Update Student" action="{!updateStudent}" rerender="studentTable"/>
             </apex:pageBlockSection>
         </apex:pageBlock>
 
@@ -104,6 +120,12 @@ Paste & Save:
                 <apex:column value="{!s.Roll_Number__c}" headerValue="Roll No"/>
                 <apex:column value="{!s.Class__c}" headerValue="Class"/>
                 <apex:column value="{!s.Mobile_No__c}" headerValue="Mobile No"/>
+
+               <apex:column>
+    <apex:commandButton value="Edit" action="{!editStudent}" rerender="studentTable">
+        <apex:param name="studentId" value="{!s.Id}" assignTo="{!student.Id}"/>
+    </apex:commandButton>
+</apex:column>
 
                 <apex:column>
                     <apex:commandButton value="Delete" action="{!deleteStudent}" rerender="studentTable">
