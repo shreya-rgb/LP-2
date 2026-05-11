@@ -1,7 +1,7 @@
-# Step-by-Step Guide: AWS Assignment 3 - MERN Stack Deployment
+# Step-by-Step Guide: MERN Basic - User CRUD (2 Instances)
 
 ## Objective
-Deploy a full MERN (MongoDB, Express, React, Node.js) application on an AWS EC2 instance.
+Deploy a full MERN (MongoDB, Express, React, Node.js) application using **2 separate AWS EC2 instances** — one for the Backend and one for the Frontend.
 
 ---
 
@@ -9,67 +9,92 @@ Deploy a full MERN (MongoDB, Express, React, Node.js) application on an AWS EC2 
 1. Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) and log in.
 2. Create a new Cluster (Free Tier).
 3. Under **Database Access**, create a new database user (e.g., `shreya` with password `Shreya@123`).
-4. Under **Network Access**, add the IP address `0.0.0.0/0` to allow access from anywhere (since your EC2 IP might change).
+4. Under **Network Access**, add the IP address `0.0.0.0/0` to allow access from anywhere.
 5. Go to **Database** -> **Connect** -> **Connect your application**.
 6. Copy the connection string. Replace `<password>` with your user's password.
 7. *Note: We have already added the connection string in `backend/server.js` for this exam setup.*
 
-## Step 2: Launch EC2 and Configure Ports
-1. Launch an Ubuntu `t2.micro` EC2 instance.
-2. In the **Security Group** settings, ensure you have these Inbound Rules:
+## Step 2: Launch 2 EC2 Instances
+
+### Instance 1: Backend
+1. Launch an Ubuntu `t2.micro` EC2 instance. Name it `MERN-Backend`.
+2. **Security Group** Inbound Rules:
    - **SSH (Port 22)**: To connect to the terminal.
-   - **Custom TCP (Port 3000)**: For the Node.js Backend.
+   - **Custom TCP (Port 3000)**: For the Node.js Backend API.
+
+### Instance 2: Frontend
+1. Launch **another** Ubuntu `t2.micro` EC2 instance. Name it `MERN-Frontend`.
+2. **Security Group** Inbound Rules:
+   - **SSH (Port 22)**: To connect to the terminal.
    - **Custom TCP (Port 3001)**: For the React Frontend.
-3. Wait for the instance to run and click **Connect**.
 
-## Step 3: Set up EC2 Environment
-In your EC2 terminal, install Node.js and Git:
-```bash
-sudo apt update
-sudo apt install nodejs npm git -y
-```
+3. **Note down both Public IPv4 addresses:**
+   - `BACKEND_IP` = Backend instance's Public IP
+   - `FRONTEND_IP` = Frontend instance's Public IP
 
-## Step 4: Clone the Repository
-Clone your GitHub repository directly into the EC2 instance:
-```bash
-git clone https://github.com/shreya-rgb/cloud-assignments.git
-```
-Navigate to the Assignment 3 folder:
-```bash
-cd cloud-assignments/AWS/Assignment3
-```
-
-## Step 5: Run the Backend
-1. Go into the backend folder:
+## Step 3: Set up Backend Instance
+1. Click on **MERN-Backend** instance → **Connect** (browser terminal).
+2. Install Node.js and Git:
    ```bash
-   cd backend
+   sudo apt update
+   sudo apt install nodejs npm git -y
    ```
-2. Install dependencies:
+3. Clone the repository:
+   ```bash
+   git clone https://github.com/shreya-rgb/LP-2.git
+   ```
+4. Navigate to backend:
+   ```bash
+   cd LP-2/AWS/MERN-Basic/backend
+   ```
+5. Install dependencies and start:
    ```bash
    npm install
-   ```
-3. Start the server:
-   ```bash
    node server.js
    ```
    *Output should say "Server running on port 3000". Leave this terminal open!*
 
-## Step 6: Run the Frontend
-1. Go to the AWS Console, select your instance, and open a **New Terminal Connection** (so the backend keeps running).
-2. Navigate to the frontend folder:
+## Step 4: Set up Frontend Instance
+1. Click on **MERN-Frontend** instance → **Connect** (browser terminal).
+2. Install Node.js and Git:
    ```bash
-   cd cloud-assignments/AWS/Assignment3/frontend
+   sudo apt update
+   sudo apt install nodejs npm git -y
    ```
-3. Install dependencies:
+3. Clone the repository:
    ```bash
-   npm install
+   git clone https://github.com/shreya-rgb/LP-2.git
    ```
-4. Start the React app:
+4. Navigate to frontend:
    ```bash
-   npm start
+   cd LP-2/AWS/MERN-Basic/frontend
    ```
 
+## Step 5: Update API URL to Point to Backend IP ⚠️ CRITICAL
+The frontend needs to know the Backend instance's IP (not `localhost`):
+```bash
+# First, check which files have 'localhost':
+grep -r "localhost" src/
+
+# Replace localhost with your Backend EC2's Public IP:
+sed -i 's/http:\/\/localhost:3000/http:\/\/BACKEND_IP:3000/g' src/App.js
+```
+> Replace `BACKEND_IP` with your actual Backend instance's Public IPv4 address!
+
+## Step 6: Start the Frontend
+```bash
+npm install
+npm start
+```
+
 ## Step 7: Test the App
-1. Go back to the AWS Console and copy your instance's **Public IPv4 address**.
-2. Open a new browser tab and go to: `http://<YOUR_PUBLIC_IP>:3001`
-3. Enter a name and click "Add User". This connects to the backend and saves to your MongoDB database! 🎉
+1. Open your browser and go to: `http://FRONTEND_IP:3001`
+   - Replace `FRONTEND_IP` with your Frontend instance's Public IPv4.
+2. Enter a name and click "Add User". The frontend (Instance 2) sends the request to the backend (Instance 1), which saves it to MongoDB Atlas! 🎉
+
+---
+
+## Architecture
+```
+User Browser → Frontend EC2 (port 3001) → Backend EC2 (port 3000) → MongoDB Atlas
+```

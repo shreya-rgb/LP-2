@@ -1,7 +1,7 @@
-# Step-by-Step Guide: AWS Assignment 4 - Online Blog Application
+# Step-by-Step Guide: Blog Application (2 Instances)
 
 ## Objective
-Deploy a full-stack blog application (frontend, backend, and database) on a cloud platform. Configure the server environment so that users can create, view, and manage blog posts through a web interface.
+Deploy a full-stack blog application using **2 separate AWS EC2 instances** — one for the Backend and one for the Frontend.
 
 ---
 
@@ -12,64 +12,88 @@ Deploy a full-stack blog application (frontend, backend, and database) on a clou
 4. Under **Network Access**, add the IP address `0.0.0.0/0` to allow access from anywhere.
 5. Go to **Database** -> **Connect** -> **Connect your application**.
 6. Copy the connection string.
-7. *Note: We have already added the connection string in `backend/server.js`. The Blog app will automatically create a `posts` collection in your existing database!*
+7. *Note: We have already added the connection string in `backend/server.js`. The Blog app will automatically create a `posts` collection!*
 
-## Step 2: Launch EC2 and Configure Ports
-1. Launch an Ubuntu `t2.micro` EC2 instance.
-2. In the **Security Group** settings, ensure you have these Inbound Rules:
-   - **SSH (Port 22)**: To connect.
-   - **Custom TCP (Port 3000)**: For the Backend.
-   - **Custom TCP (Port 3001)**: For the Frontend.
-3. Wait for the instance to run and click **Connect**.
+## Step 2: Launch 2 EC2 Instances
 
-## Step 3: Set up EC2 Environment
-In your EC2 terminal, install Node.js and Git:
-```bash
-sudo apt update
-sudo apt install nodejs npm git -y
-```
+### Instance 1: Backend
+1. Launch an Ubuntu `t2.micro` EC2 instance. Name it `Blog-Backend`.
+2. **Security Group** Inbound Rules:
+   - **SSH (Port 22)**: To connect to the terminal.
+   - **Custom TCP (Port 3000)**: For the Node.js Backend API.
 
-## Step 4: Clone the Repository
-Clone your GitHub repository directly into the EC2 instance:
-```bash
-git clone https://github.com/shreya-rgb/cloud-assignments.git
-```
-Navigate to the Assignment 4 folder:
-```bash
-cd cloud-assignments/AWS/Assignment4
-```
+### Instance 2: Frontend
+1. Launch **another** Ubuntu `t2.micro` EC2 instance. Name it `Blog-Frontend`.
+2. **Security Group** Inbound Rules:
+   - **SSH (Port 22)**: To connect to the terminal.
+   - **Custom TCP (Port 3001)**: For the React Frontend.
 
-## Step 5: Run the Backend
-1. Go into the backend folder:
+3. **Note down both Public IPv4 addresses:**
+   - `BACKEND_IP` = Backend instance's Public IP
+   - `FRONTEND_IP` = Frontend instance's Public IP
+
+## Step 3: Set up Backend Instance
+1. Click on **Blog-Backend** instance → **Connect** (browser terminal).
+2. Install Node.js and Git:
    ```bash
-   cd backend
+   sudo apt update
+   sudo apt install nodejs npm git -y
    ```
-2. Install dependencies:
+3. Clone the repository:
+   ```bash
+   git clone https://github.com/shreya-rgb/LP-2.git
+   ```
+4. Navigate to backend:
+   ```bash
+   cd LP-2/AWS/MERN-Blog_9/backend
+   ```
+5. Install dependencies and start:
    ```bash
    npm install
-   ```
-3. Start the server:
-   ```bash
    node server.js
    ```
    *Output should say "Blog Backend running". Leave this terminal open!*
 
-## Step 6: Run the Frontend
-1. Go to the AWS Console, select your instance, and open a **New Terminal Connection**.
-2. Navigate to the frontend folder:
+## Step 4: Set up Frontend Instance
+1. Click on **Blog-Frontend** instance → **Connect** (browser terminal).
+2. Install Node.js and Git:
    ```bash
-   cd cloud-assignments/AWS/Assignment4/frontend
+   sudo apt update
+   sudo apt install nodejs npm git -y
    ```
-3. Install dependencies:
+3. Clone the repository:
    ```bash
-   npm install
+   git clone https://github.com/shreya-rgb/LP-2.git
    ```
-4. Start the React app:
+4. Navigate to frontend:
    ```bash
-   npm start
+   cd LP-2/AWS/MERN-Blog_9/frontend
    ```
 
+## Step 5: Update API URL to Point to Backend IP ⚠️ CRITICAL
+The frontend needs to know the Backend instance's IP (not `localhost`):
+```bash
+# First, check which files have 'localhost':
+grep -r "localhost" src/
+
+# Replace localhost with your Backend EC2's Public IP:
+sed -i 's/http:\/\/localhost:3000/http:\/\/BACKEND_IP:3000/g' src/App.js
+```
+> Replace `BACKEND_IP` with your actual Backend instance's Public IPv4 address!
+
+## Step 6: Start the Frontend
+```bash
+npm install
+npm start
+```
+
 ## Step 7: Test the Blog App
-1. Go back to the AWS Console and copy your instance's **Public IPv4 address**.
-2. Open a new browser tab and go to: `http://<YOUR_PUBLIC_IP>:3001`
-3. Enter a Blog Title and Content, and click "Add Post"! 🎉
+1. Open your browser and go to: `http://FRONTEND_IP:3001`
+2. Enter a Blog Title and Content, and click "Add Post"! The frontend (Instance 2) sends the request to the backend (Instance 1), which saves it to MongoDB Atlas! 🎉
+
+---
+
+## Architecture
+```
+User Browser → Frontend EC2 (port 3001) → Backend EC2 (port 3000) → MongoDB Atlas
+```
