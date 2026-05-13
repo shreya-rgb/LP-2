@@ -48,6 +48,8 @@ Now, you need to replace the default Apache landing page with your own `index.ht
    ```bash
    cd /var/www/html
    ```
+   (after this, you can directy do- 1)sudo truncate -s 0 index.html 2)sudo nano /var/www/html/index.html and then paste or write that html code here, then the website will directly run on public ip, no need to follow below steps
+)
 2. Remove the default `index.html` file:
    ```bash
    sudo rm index.html
