@@ -31,10 +31,14 @@ public class EmailSenderController {
         ApexPages.getMessages().clear();
 
         // 1. Validate Email format
-        if (String.isBlank(toAddress) || !Pattern.matches('^[a-zA-Z0-9._|\\\\%#~`=?&/$^*!}{+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$', toAddress)) {
-            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Invalid Email ID provided. Please enter a valid email address.'));
-            return;
-        }
+        // if (String.isBlank(toAddress) || !Pattern.matches('^[a-zA-Z0-9._|\\\\%#~`=?&/$^*!}{+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$', toAddress)) {
+        //    ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Invalid Email ID provided. Please enter a valid email address.'));
+        //    return;
+        //}
+            if (String.isBlank(toAddress) || !toAddress.contains('@') || !toAddress.contains('.')) {
+                ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Invalid Email ID provided.'));
+                return;
+            }
 
         try {
             // 2. Create Email Object
