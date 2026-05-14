@@ -1,34 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ShopBot - Customer Support</title>
+  <title>ShopBot - Customer Assistant</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
-
-
 <body>
 
   <div id="app">
 
     <!-- Header -->
     <div id="header">
-      <h2>🛍️ ShopBot</h2>
-      <p>Customer Support Assistant</p>
+      <h2>🛒 ShopBot Assistant</h2>
+      <p>How can I help you with your shopping today?</p>
     </div>
 
     <!-- Chat Messages Area -->
     <div id="messages"></div>
 
-    <!-- Quick Reply Buttons -->
-    <div id="quick-btns">
-      <button class="qbtn" onclick="sendMsg('Track my order')">📦 Track Order</button>
-      <button class="qbtn" onclick="sendMsg('Return a product')">🔄 Returns</button>
-      <button class="qbtn" onclick="sendMsg('Payment issue')">💳 Payment</button>
-      <button class="qbtn" onclick="sendMsg('Shipping info')">🚚 Shipping</button>
-      <button class="qbtn" onclick="sendMsg('Talk to human')">👤 Human Agent</button>
+    <!-- Quick Category Buttons -->
+    <div id="categories">
+      <button class="cat" onclick="sendMsg('track order')">📦 Track Order</button>
+      <button class="cat" onclick="sendMsg('refund policy')">💸 Refund/Return</button>
+      <button class="cat" onclick="sendMsg('shipping info')">🚚 Shipping</button>
+      <button class="cat" onclick="sendMsg('payment methods')">💳 Payment</button>
+      <button class="cat" onclick="sendMsg('contact support')">📞 Support</button>
     </div>
 
     <!-- Input Row -->
@@ -36,7 +33,7 @@
       <input
         id="user-input"
         type="text"
-        placeholder="Type your message here..."
+        placeholder="Type your question..."
         onkeydown="if(event.key === 'Enter') sendMsg()"
       />
       <button id="send-btn" onclick="sendMsg()">Send</button>
@@ -45,8 +42,7 @@
   </div>
 
   <script src="js/rules.js"></script>
-  <script src="js/chatbot.js"></script>
+  <script src="js/expert.js"></script>
 
 </body>
-
 </html>
