@@ -50,24 +50,97 @@
 
 ```java
 public class ProductController {
+
     public Product_Inventory__c product {get;set;}
     public List<Product_Inventory__c> productList {get;set;}
+    public String searchText {get;set;}
 
+    // Constructor
     public ProductController() {
+
         product = new Product_Inventory__c();
-        productList = [SELECT Id, Product_Name__c, Serial_No__c, Manufacture_Date__c, Expiry_Date__c FROM Product_Inventory__c];
+
+        productList = [
+            SELECT Id,
+                   Product_Name__c,
+                   Serial_No__c,
+                   Manufacture_Date__c,
+                   Expiry_Date__c
+            FROM Product_Inventory__c
+        ];
     }
 
+    // ADD PRODUCT
     public void addProduct() {
-        product.Id = null;
+
         insert product;
-        product = new Product_Inventory__c(); // reset form
-        productList = [SELECT Id, Product_Name__c, Serial_No__c, Manufacture_Date__c, Expiry_Date__c FROM Product_Inventory__c]; // refresh list
+
+        product = new Product_Inventory__c();
+
+        refreshProducts();
     }
 
+    // DELETE PRODUCT
     public void deleteProduct() {
-        delete [SELECT Id FROM Product_Inventory__c WHERE Id = :product.Id];
-        productList = [SELECT Id, Product_Name__c, Serial_No__c, Manufacture_Date__c, Expiry_Date__c FROM Product_Inventory__c]; // refresh list
+
+        delete [
+            SELECT Id
+            FROM Product_Inventory__c
+            WHERE Id = :product.Id
+        ];
+
+        refreshProducts();
+    }
+
+    // EDIT PRODUCT
+    public void editProduct() {
+
+        product = [
+            SELECT Id,
+                   Product_Name__c,
+                   Serial_No__c,
+                   Manufacture_Date__c,
+                   Expiry_Date__c
+            FROM Product_Inventory__c
+            WHERE Id = :product.Id
+        ];
+    }
+
+    // UPDATE PRODUCT
+    public void updateProduct() {
+
+        update product;
+
+        product = new Product_Inventory__c();
+
+        refreshProducts();
+    }
+
+    // SEARCH PRODUCT
+    public void searchProduct() {
+
+        productList = [
+            SELECT Id,
+                   Product_Name__c,
+                   Serial_No__c,
+                   Manufacture_Date__c,
+                   Expiry_Date__c
+            FROM Product_Inventory__c
+            WHERE Product_Name__c LIKE :('%' + searchText + '%')
+        ];
+    }
+
+    // REFRESH PRODUCT LIST
+    public void refreshProducts() {
+
+        productList = [
+            SELECT Id,
+                   Product_Name__c,
+                   Serial_No__c,
+                   Manufacture_Date__c,
+                   Expiry_Date__c
+            FROM Product_Inventory__c
+        ];
     }
 }
 ```
@@ -83,39 +156,126 @@ Paste & Save:
 
 ```html
 <apex:page controller="ProductController">
+
     <h2>Product Inventory Management System</h2>
 
     <apex:form>
 
-        <apex:pageBlock title="Add New Product">
-            <apex:pageBlockSection columns="1">
-                <apex:inputText value="{!product.Product_Name__c}" label="Product Name"/>
-                <apex:inputText value="{!product.Serial_No__c}" label="Serial No"/>
-                <apex:inputField value="{!product.Manufacture_Date__c}" label="Manufacture Date"/>
-                <apex:inputField value="{!product.Expiry_Date__c}" label="Expiry Date"/>
+        <!-- SEARCH SECTION -->
 
-                <apex:commandButton value="Add Product" action="{!addProduct}" rerender="productTable"/>
+        <apex:pageBlock title="Search Product">
+
+            <apex:pageBlockSection columns="2">
+
+                <apex:inputText value="{!searchText}"
+                                label="Product Name"/>
+
+                <apex:commandButton value="Search"
+                                    action="{!searchProduct}"
+                                    rerender="productTable"/>
+
+                <apex:commandButton value="Show All"
+                                    action="{!refreshProducts}"
+                                    rerender="productTable"/>
+
             </apex:pageBlockSection>
+
         </apex:pageBlock>
 
+        <!-- ADD / UPDATE SECTION -->
+
+        <apex:pageBlock title="Add / Update Product">
+
+            <apex:pageBlockSection columns="1">
+
+                <apex:inputText value="{!product.Product_Name__c}"
+                                label="Product Name"/>
+
+                <apex:inputText value="{!product.Serial_No__c}"
+                                label="Serial No"/>
+
+                <apex:inputField value="{!product.Manufacture_Date__c}"
+                                  label="Manufacture Date"/>
+
+                <apex:inputField value="{!product.Expiry_Date__c}"
+                                  label="Expiry Date"/>
+
+                <!-- ADD BUTTON -->
+
+                <apex:commandButton value="Add Product"
+                                    action="{!addProduct}"
+                                    rerender="productTable"
+                                    rendered="{!ISNULL(product.Id)}"/>
+
+                <!-- UPDATE BUTTON -->
+
+                <apex:commandButton value="Update Product"
+                                    action="{!updateProduct}"
+                                    rerender="productTable"
+                                    rendered="{!NOT(ISNULL(product.Id))}"/>
+
+            </apex:pageBlockSection>
+
+        </apex:pageBlock>
+
+        <!-- PRODUCT TABLE -->
+
         <apex:pageBlock title="Inventory List">
-            <apex:pageBlockTable value="{!productList}" var="p" id="productTable">
 
-                <apex:column value="{!p.Product_Name__c}" headerValue="Product Name"/>
-                <apex:column value="{!p.Serial_No__c}" headerValue="Serial No"/>
-                <apex:column value="{!p.Manufacture_Date__c}" headerValue="Manufacture Date"/>
-                <apex:column value="{!p.Expiry_Date__c}" headerValue="Expiry Date"/>
+            <apex:pageBlockTable value="{!productList}"
+                                 var="p"
+                                 id="productTable">
 
-                <apex:column>
-                    <apex:commandButton value="Delete" action="{!deleteProduct}" rerender="productTable">
-                        <apex:param name="productId" value="{!p.Id}" assignTo="{!product.Id}"/>
+                <apex:column value="{!p.Product_Name__c}"
+                             headerValue="Product Name"/>
+
+                <apex:column value="{!p.Serial_No__c}"
+                             headerValue="Serial No"/>
+
+                <apex:column value="{!p.Manufacture_Date__c}"
+                             headerValue="Manufacture Date"/>
+
+                <apex:column value="{!p.Expiry_Date__c}"
+                             headerValue="Expiry Date"/>
+
+                <!-- EDIT BUTTON -->
+
+                <apex:column headerValue="Edit">
+
+                    <apex:commandButton value="Edit"
+                                        action="{!editProduct}"
+                                        rerender="productTable">
+
+                        <apex:param name="productId"
+                                    value="{!p.Id}"
+                                    assignTo="{!product.Id}"/>
+
                     </apex:commandButton>
+
+                </apex:column>
+
+                <!-- DELETE BUTTON -->
+
+                <apex:column headerValue="Delete">
+
+                    <apex:commandButton value="Delete"
+                                        action="{!deleteProduct}"
+                                        rerender="productTable">
+
+                        <apex:param name="productId"
+                                    value="{!p.Id}"
+                                    assignTo="{!product.Id}"/>
+
+                    </apex:commandButton>
+
                 </apex:column>
 
             </apex:pageBlockTable>
+
         </apex:pageBlock>
 
     </apex:form>
+
 </apex:page>
 ```
 
